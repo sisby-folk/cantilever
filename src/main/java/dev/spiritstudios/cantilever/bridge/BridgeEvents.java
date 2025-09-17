@@ -51,10 +51,7 @@ public class BridgeEvents {
 
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
 			BridgeEvents.bridge.sendShutdownMessageM2D(CantileverConfig.INSTANCE.gameEventFormat.get().formatted("Server stopped"));
-			JDA api = BridgeEvents.bridge.api();
-			if (api != null) {
-				api.shutdownNow();
-			}
+			BridgeEvents.bridge.stop();
 		});
 
 		ServerMessageEvents.GAME_MESSAGE.register((server, message, overlay) -> {

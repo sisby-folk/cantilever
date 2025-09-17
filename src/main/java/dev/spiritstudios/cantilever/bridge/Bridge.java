@@ -97,6 +97,15 @@ public class Bridge {
 		BridgeEvents.init(this);
 	}
 
+	public void stop() {
+		if (api != null) {
+			api.shutdownNow();
+		}
+		if (bridgeChannelWebhook != null) {
+			bridgeChannelWebhook.close();
+		}
+	}
+
 	private String filterMessage(Map<String, String> map, String message) {
 		final String[] replacedMessage = {message};
 		map.forEach(
