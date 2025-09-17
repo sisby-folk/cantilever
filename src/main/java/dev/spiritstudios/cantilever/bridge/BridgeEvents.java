@@ -61,7 +61,11 @@ public class BridgeEvents {
 
 		ServerMessageEvents.COMMAND_MESSAGE.register((message, source, parameters) -> {
 			if (message.getContent().getContent() instanceof BridgeTextContent content && content.bot()) return;
-			BridgeEvents.bridge.sendWebhookMessageM2D(message.getContent(), source.getPlayer());
+			if (source.isExecutedByPlayer()) {
+				BridgeEvents.bridge.sendWebhookMessageM2D(message.getContent(), source.getPlayer());
+				return;
+			}
+			BridgeEvents.bridge.sendBasicMessageM2D(CantileverConfig.INSTANCE.gameEventFormat.get().formatted(message.getContent().getString()));
 		});
 
 		ServerMessageEvents.CHAT_MESSAGE.register((message, user, params) -> BridgeEvents.bridge.sendWebhookMessageM2D(message.getContent(), user));
