@@ -3,18 +3,14 @@ package dev.spiritstudios.cantilever.bridge;
 import dev.spiritstudios.cantilever.Cantilever;
 import dev.spiritstudios.cantilever.CantileverConfig;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Unit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
-import java.util.WeakHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -72,7 +68,6 @@ public class BridgeEvents {
 	}
 
 	private static ScheduledExecutorService scheduler;
-	private static Map<Long, Unit> deletedMessageIds;
 
 	private static void registerDiscordEvents() {
 		if (BridgeEvents.bridge == null)
@@ -100,27 +95,18 @@ public class BridgeEvents {
 						thread.setUncaughtExceptionHandler((thread1, throwable) -> Cantilever.LOGGER.error("Caught exception in D2M Message Scheduler", throwable));
 						return thread;
 					});
-					deletedMessageIds = new WeakHashMap<>();
 				}
 
 				if (scheduler != null) {
 					scheduler.schedule(() -> {
-						if (deletedMessageIds.remove(event.getMessageIdLong()) != null)
-							return;
-
-						BridgeEvents.bridge.sendUserMessageD2M(authorName, event.getMessage().getContentDisplay());
+						event.getChannel().retrieveMessageById(event.getMessageIdLong()).onSuccess(message ->
+							BridgeEvents.bridge.sendUserMessageD2M(authorName, message.getContentDisplay())
+						).complete();
 					}, CantileverConfig.INSTANCE.d2mMessageDelay.get(), TimeUnit.MILLISECONDS);
 					return;
 				}
 
 				BridgeEvents.bridge.sendUserMessageD2M(authorName, event.getMessage().getContentDisplay());
-			}
-
-			@Override
-			public void onMessageDelete(MessageDeleteEvent event) {
-				if (deletedMessageIds != null) {
-					deletedMessageIds.put(event.getMessageIdLong(), Unit.INSTANCE);
-				}
 			}
 		});
 	}
