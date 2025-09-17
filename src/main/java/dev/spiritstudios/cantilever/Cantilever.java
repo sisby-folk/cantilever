@@ -3,6 +3,7 @@ package dev.spiritstudios.cantilever;
 import dev.spiritstudios.cantilever.bridge.Bridge;
 import dev.spiritstudios.cantilever.bridge.BridgeTextContent;
 import dev.spiritstudios.specter.api.serialization.text.TextContentRegistry;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Activity;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -33,7 +34,10 @@ public class Cantilever implements ModInitializer {
 		);
 
 		ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, manager, success) -> {
-			bridge().api().getPresence().setActivity(CantileverConfig.INSTANCE.statusMessage.get().isEmpty() ?
+			JDA api = bridge().api();
+			if (api == null)
+				return;
+			api.getPresence().setActivity(CantileverConfig.INSTANCE.statusMessage.get().isEmpty() ?
 				null :
 				Activity.of(CantileverConfig.INSTANCE.activityType.get(), CantileverConfig.INSTANCE.statusMessage.get()));
 		});
