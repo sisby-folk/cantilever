@@ -29,6 +29,20 @@ loom {
 repositories {
 	mavenCentral()
 	maven("https://maven.spiritstudios.dev/releases/")
+	exclusiveContent {
+		forRepository {
+			maven {
+				name = "Modrinth"
+				url = uri("https://api.modrinth.com/maven")
+			}
+		}
+		filter {
+			includeGroup("maven.modrinth")
+		}
+	}
+	maven("https://maven.nucleoid.xyz") {
+		name = "Nucleoid"
+	}
 }
 
 dependencies {
@@ -46,6 +60,12 @@ dependencies {
 
 	implementation(libs.discordwebhooks)
 	shadow(libs.discordwebhooks)
+
+	modImplementation(libs.styled.chat)
+	modImplementation(libs.pb4.api.predicate)
+	modImplementation(libs.pb4.api.placeholder)
+	modImplementation(libs.pb4.api.playerdata)
+	modImplementation(libs.fabric.permissions)
 }
 
 tasks.processResources {
