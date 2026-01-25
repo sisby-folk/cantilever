@@ -1,6 +1,7 @@
 package dev.spiritstudios.cantilever;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import dev.spiritstudios.specter.api.config.Config;
 import dev.spiritstudios.specter.api.config.ConfigHolder;
 import dev.spiritstudios.specter.api.config.Value;
@@ -9,6 +10,13 @@ import net.dv8tion.jda.api.entities.Activity;
 import java.util.Map;
 
 public class CantileverConfig extends Config<CantileverConfig> {
+	private static final Codec<Long> NON_NEGATIVE_LONG_CODEC = Codec.LONG.validate(l -> {
+		if (l > -1) {
+			return DataResult.success(l);
+		}
+		return DataResult.error(() -> "Value must not be negative.");
+	});
+
 	public static final ConfigHolder<CantileverConfig, ?> HOLDER = ConfigHolder.builder(Cantilever.id(Cantilever.MODID), CantileverConfig.class)
 		.build();
 
@@ -32,7 +40,7 @@ public class CantileverConfig extends Config<CantileverConfig> {
 		.comment("Use a %s slot to set the player UUID for your head service of choice!")
 		.build();
 
-	public final Value<Long> d2mMessageDelay = value(0L, Codec.LONG)
+	public final Value<Long> d2mMessageDelay = value(0L, NON_NEGATIVE_LONG_CODEC)
 		.comment("The delay for sending a message from Discord to Minecraft in milliseconds. Set up to make sure that Webhook related Discord Bots such as PluralKit and Tupperbox may send messages from users..")
 		.build();
 

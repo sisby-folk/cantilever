@@ -1,11 +1,13 @@
 package dev.spiritstudios.cantilever;
 
 import dev.spiritstudios.cantilever.bridge.Bridge;
-import dev.spiritstudios.cantilever.bridge.BridgeTextContent;
-import dev.spiritstudios.specter.api.serialization.text.TextContentRegistry;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Activity;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.minecraft.network.message.MessageType;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,12 +15,14 @@ import org.slf4j.LoggerFactory;
 public class Cantilever implements ModInitializer {
 	public static final String MODID = "cantilever";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
+	public static final RegistryKey<MessageType> D2M_MESSAGE_TYPE = RegistryKey.of(
+		RegistryKeys.MESSAGE_TYPE,
+		id("d2m")
+	);
 	private static Bridge bridge;
 
 	@Override
 	public void onInitialize() {
-		TextContentRegistry.register("bot", BridgeTextContent.TYPE);
-
 		ServerLifecycleEvents.SERVER_STARTING.register(
 			id("before_bridge"),
 			server -> {
@@ -33,7 +37,10 @@ public class Cantilever implements ModInitializer {
 		);
 
 		ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, manager, success) -> {
-			bridge().api().getPresence().setActivity(CantileverConfig.INSTANCE.statusMessage.get().isEmpty() ?
+			JDA api = bridge().api();
+			if (api == null)
+				return;
+			api.getPresence().setActivity(CantileverConfig.INSTANCE.statusMessage.get().isEmpty() ?
 				null :
 				Activity.of(CantileverConfig.INSTANCE.activityType.get(), CantileverConfig.INSTANCE.statusMessage.get()));
 		});

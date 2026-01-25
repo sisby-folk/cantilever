@@ -3,26 +3,17 @@ package dev.spiritstudios.cantilever.bridge;
 import dev.spiritstudios.cantilever.Cantilever;
 import dev.spiritstudios.cantilever.CantileverConfig;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Unit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Random;
-import java.util.WeakHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 public class BridgeEvents {
 	@Nullable
@@ -56,27 +47,27 @@ public class BridgeEvents {
 
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
 			BridgeEvents.bridge.sendShutdownMessageM2D(CantileverConfig.INSTANCE.gameEventFormat.get().formatted("Server stopped"));
-			JDA api = BridgeEvents.bridge.api();
-			if (api != null) {
-				api.shutdownNow();
-			}
+			BridgeEvents.bridge.stop();
 		});
 
 		ServerMessageEvents.GAME_MESSAGE.register((server, message, overlay) -> {
-			if (message.getContent() instanceof BridgeTextContent content && content.bot()) return;
+			if (message.getContent() instanceof BridgeTextContent) return;
 			BridgeEvents.bridge.sendBasicMessageM2D(CantileverConfig.INSTANCE.gameEventFormat.get().formatted(message.getString()));
 		});
 
 		ServerMessageEvents.COMMAND_MESSAGE.register((message, source, parameters) -> {
-			if (message.getContent().getContent() instanceof BridgeTextContent content && content.bot()) return;
-			BridgeEvents.bridge.sendWebhookMessageM2D(message.getContent(), source.getPlayer());
+			if (message.getContent().getContent() instanceof BridgeTextContent) return;
+			if (source.isExecutedByPlayer()) {
+				BridgeEvents.bridge.sendWebhookMessageM2D(message.getContent(), source.getPlayer());
+				return;
+			}
+			BridgeEvents.bridge.sendBasicMessageM2D(CantileverConfig.INSTANCE.gameEventFormat.get().formatted(message.getContent().getString()));
 		});
 
 		ServerMessageEvents.CHAT_MESSAGE.register((message, user, params) -> BridgeEvents.bridge.sendWebhookMessageM2D(message.getContent(), user));
 	}
 
 	private static ScheduledExecutorService scheduler;
-	private static Map<Long, Unit> deletedMessageIds;
 
 	private static void registerDiscordEvents() {
 		if (BridgeEvents.bridge == null)
@@ -104,48 +95,18 @@ public class BridgeEvents {
 						thread.setUncaughtExceptionHandler((thread1, throwable) -> Cantilever.LOGGER.error("Caught exception in D2M Message Scheduler", throwable));
 						return thread;
 					});
-					deletedMessageIds = new WeakHashMap<>();
 				}
 
 				if (scheduler != null) {
 					scheduler.schedule(() -> {
-						if (deletedMessageIds.remove(event.getMessageIdLong()) != null)
-							return;
-
-						BridgeEvents.bridge.sendUserMessageD2M(authorName, event.getMessage().getContentDisplay());
+						event.getChannel().retrieveMessageById(event.getMessageIdLong()).onSuccess(message ->
+							BridgeEvents.bridge.sendUserMessageD2M(authorName, message.getContentDisplay())
+						).complete();
 					}, CantileverConfig.INSTANCE.d2mMessageDelay.get(), TimeUnit.MILLISECONDS);
 					return;
 				}
 
-				// OB*BO CENSORING
-				Pattern direCurse = Pattern.compile("[oO0](?:[^0-9a-zA-Z]*|\\s)*[bB](?:[^0-9a-zA-Z]*|\\s)*[aA](?:[^0-9a-zA-Z]*|\\s)[bB](?:[^0-9a-zA-Z]*|\\s)*[oO0]");
-				Cantilever.LOGGER.info("{}meow", event.getMessage().getContentDisplay());
-				if (direCurse.matcher(event.getMessage().getContentDisplay()).find()) {
-					String[] badbadgirl = {
-						"No.",
-						"Bad.",
-						"How dare you.",
-						">:3",
-						"Do not say ob*bo.",
-						"Seven.",
-						"ob\\*bo more like ob\\*b-cringe",
-						"Await my wrath.",
-						"meow :(",
-						"literally 1984"
-					};
-					BridgeEvents.bridge.sendBasicMessageM2D(badbadgirl[new Random().nextInt(badbadgirl.length)]);
-					BridgeEvents.bridge.sendBasicMessageD2M(new BridgeTextContent(Text.of("%s succumbed to the dire curse".formatted(authorName)), true));
-					return;
-				}
-
 				BridgeEvents.bridge.sendUserMessageD2M(authorName, event.getMessage().getContentDisplay());
-			}
-
-			@Override
-			public void onMessageDelete(MessageDeleteEvent event) {
-				if (deletedMessageIds != null) {
-					deletedMessageIds.put(event.getMessageIdLong(), Unit.INSTANCE);
-				}
 			}
 		});
 	}

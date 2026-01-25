@@ -13,6 +13,12 @@ specter = "1.1.8"
 jda = "5.5.1"
 discord-webhooks = "0.8.4"
 
+styled-chat = "E1RdcKyb"
+pb4-api-predicate = "0.6.0+1.21.2"
+pb4-api-placeholder = "2.6.1+1.21.5"
+pb4-api-playerdata = "0.7.0+1.21.5"
+fabric-permissions = "0.3.3"
+
 [plugins]
 fabric_loom = { id = "fabric-loom", version.ref = "fabric_loom" }
 minotaur = { id = "com.modrinth.minotaur", version.ref = "minotaur" }
@@ -31,6 +37,12 @@ specter_serialization = { group = "dev.spiritstudios.specter", name = "specter-s
 
 jda = { group = "net.dv8tion", name = "JDA", version.ref = "jda" }
 discordwebhooks = { group = "club.minnced", name = "discord-webhooks", version.ref = "discord-webhooks" }
+
+styled-chat = { module = "maven.modrinth:styled-chat", version.ref = "styled-chat" }
+pb4-api-predicate = { module = "eu.pb4:predicate-api", version.ref = "pb4-api-predicate" }
+pb4-api-placeholder = { module = "eu.pb4:placeholder-api", version.ref = "pb4-api-placeholder" }
+pb4-api-playerdata = { module = "eu.pb4:player-data-api", version.ref = "pb4-api-playerdata" }
+fabric-permissions = { module = "me.lucko:fabric-permissions-api", version.ref = "fabric-permissions" }
 
 [bundles]
 specter = [
