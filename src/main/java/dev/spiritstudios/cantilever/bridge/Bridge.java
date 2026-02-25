@@ -3,6 +3,7 @@ package dev.spiritstudios.cantilever.bridge;
 import club.minnced.discord.webhook.WebhookClient;
 import club.minnced.discord.webhook.external.JDAWebhookClient;
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
+import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import dev.spiritstudios.cantilever.Cantilever;
 import dev.spiritstudios.cantilever.CantileverConfig;
 import eu.pb4.styledchat.StyledChatUtils;
@@ -146,7 +147,7 @@ public class Bridge {
 		this.bridgeChannelWebhook.send(
 			new WebhookMessageBuilder()
 				.setUsername(username)
-				.setAvatarUrl(CantileverConfig.INSTANCE.webhookFaceApi.value().formatted(sender.getUuidAsString()))
+				.setAvatarUrl(CantileverConfig.INSTANCE.webhookFaceApi.value().formatted(sender.getServer().getSessionService().getTextures(sender.getGameProfile(), false).get(MinecraftProfileTexture.Type.SKIN).getHash()))
 				.append(filterMessageM2D(message.getString()))
 				.build()
 		);
