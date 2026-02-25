@@ -174,7 +174,7 @@ public class Bridge {
 			formattedText = message.getContent();
 		}
 		MutableText bridgeText =
-			MutableText.of(new BridgeTextContent(formattedText));
+			Text.empty().append(Text.literal("").styled(s -> s.withInsertion("BRIDGE"))).append(formattedText);
 		this.server.getPlayerManager().broadcast(bridgeText, false);
 	}
 

@@ -51,12 +51,12 @@ public class BridgeEvents {
 		});
 
 		ServerMessageEvents.GAME_MESSAGE.register((server, message, overlay) -> {
-			if (message.getContent() instanceof BridgeTextContent) return;
+			if (message.getSiblings().stream().anyMatch(t -> "BRIDGE".equals(t.getStyle().getInsertion()))) return;
 			BridgeEvents.bridge.sendBasicMessageM2D(CantileverConfig.INSTANCE.gameEventFormat.value().formatted(message.getString()));
 		});
 
 		ServerMessageEvents.COMMAND_MESSAGE.register((message, source, parameters) -> {
-			if (message.getContent().getContent() instanceof BridgeTextContent) return;
+			if (message.getContent().getSiblings().stream().anyMatch(t -> "BRIDGE".equals(t.getStyle().getInsertion()))) return;
 			if (source.isExecutedByPlayer()) {
 				BridgeEvents.bridge.sendWebhookMessageM2D(message.getContent(), source.getPlayer());
 				return;
