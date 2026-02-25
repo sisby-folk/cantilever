@@ -85,6 +85,7 @@ tasks.shadowJar {
 	tasks.shadowJar.get().configurations.set(arrayListOf(project.configurations.shadow.get()))
 	relocate("net.dv8tion.jda", "dev.spiritstudios.cantilever.jda.shade")
 	relocate("com.eduardomcb.discord.webhook", "dev.spiritstudios.cantilever.discord.webhook.shade")
+	minimize()
 }
 
 tasks.remapJar {
