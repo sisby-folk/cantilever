@@ -43,6 +43,7 @@ repositories {
 	maven("https://maven.nucleoid.xyz") {
 		name = "Nucleoid"
 	}
+	maven("https://repo.sleeping.town/")
 }
 
 dependencies {
@@ -52,8 +53,8 @@ dependencies {
 
 	modImplementation(libs.fabric.api)
 
-	include(libs.bundles.specter)
-	modImplementation(libs.bundles.specter)
+	include(libs.kaleido)
+	implementation(libs.kaleido)
 
 	implementation(libs.jda) { exclude(module = "opus-java") }
 	shadow(libs.jda) { exclude(module = "opus-java") }
