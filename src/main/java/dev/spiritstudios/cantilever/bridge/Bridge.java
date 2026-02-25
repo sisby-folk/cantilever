@@ -146,7 +146,7 @@ public class Bridge {
 		this.bridgeChannelWebhook.send(
 			new WebhookMessageBuilder()
 				.setUsername(username)
-				.setAvatarUrl(CantileverConfig.INSTANCE.webhookFaceApi.value().formatted(sender.getUuidAsString()))
+				.setAvatarUrl(CantileverConfig.INSTANCE.webhookFaceApi.value().formatted(sender.getServer().getSessionService().getTextures(sender.getGameProfile()).skin().getHash()))
 				.append(filterMessageM2D(message.getString()))
 				.build()
 		);
