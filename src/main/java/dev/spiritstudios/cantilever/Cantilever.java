@@ -6,9 +6,9 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.network.message.MessageType;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +16,7 @@ public class Cantilever implements ModInitializer {
 	public static final String MODID = "cantilever";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 	public static final RegistryKey<MessageType> D2M_MESSAGE_TYPE = RegistryKey.of(
-		RegistryKeys.MESSAGE_TYPE,
+		Registry.MESSAGE_TYPE_KEY,
 		id("d2m")
 	);
 	private static Bridge bridge;

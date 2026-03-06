@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.network.message.DecoratedContents;
 import net.minecraft.network.message.SignedMessage;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
@@ -161,7 +162,7 @@ public class Bridge {
 	}
 
 	public void sendBasicMessageD2M(String text) {
-		SignedMessage message = SignedMessage.ofUnsigned(filterMessageD2M(text));
+		SignedMessage message = SignedMessage.ofUnsigned(new DecoratedContents(filterMessageD2M(text)));
 		ServerCommandSource commandSource = this.server.getCommandSource();
 		Text formattedText;
 		if (FabricLoader.getInstance().isModLoaded("styledchat")) {
