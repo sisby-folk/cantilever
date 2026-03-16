@@ -144,10 +144,12 @@ public class Bridge {
 		}
 		String username = CantileverConfig.INSTANCE.useMinecraftNicknames.value() && sender.getDisplayName() != null ? sender.getDisplayName().getString() : sender.getName().getString();
 
+		MinecraftProfileTexture skin = sender.getServer().getSessionService().getTextures(sender.getGameProfile(), false).get(MinecraftProfileTexture.Type.SKIN);
+
 		this.bridgeChannelWebhook.send(
 			new WebhookMessageBuilder()
 				.setUsername(username)
-				.setAvatarUrl(CantileverConfig.INSTANCE.webhookFaceApi.value().formatted(sender.getServer().getSessionService().getTextures(sender.getGameProfile(), false).get(MinecraftProfileTexture.Type.SKIN).getHash()))
+				.setAvatarUrl(CantileverConfig.INSTANCE.webhookFaceApi.value().formatted(skin == null ? sender.getGameProfile().getName() : skin.getHash()))
 				.append(filterMessageM2D(message.getString()))
 				.build()
 		);
